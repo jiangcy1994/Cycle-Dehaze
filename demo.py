@@ -21,18 +21,18 @@ if not os.path.exists(path_downscaled):
     os.mkdir(path_downscaled)
 
 
-#Create log file
+# Create log file
 sys.stderr=sys.stdout
 os.mkdir('logs')
 sys.stdout=open('logs/log_' + today + '.out')
 
-#Downscaling
+# Downscaling
 exec('resize_im.py', pathInput, path_downscaled)
 
-#Dehazing
+# Dehazing
 exec('convertHazy2GT.py', path_downscaled, modelfile)
 
-#Upscaling
+# Upscaling
 exec('laplacian.py', pathInput, pathOutput)
 
 
