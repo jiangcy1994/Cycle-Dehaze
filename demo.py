@@ -30,7 +30,11 @@ sys.stdout=open('logs/log_' + today + '.out')
 exec('resize_im.py', pathInput, path_downscaled)
 
 # Dehazing
-exec('convertHazy2GT.py', path_downscaled, modelfile)
+# Dehaze all given images under a folder with given model
+# Example Usage: sh convertHazy2GT.sh folder_name model_name
+
+for img_name in os.listdir(path_downscaled):
+    inference(model=modelfile, input=img_name, output=img_name, image_size=256)
 
 # Upscaling
 exec('laplacian.py', pathInput, pathOutput)
