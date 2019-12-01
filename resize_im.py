@@ -1,11 +1,10 @@
-from cv2 import imread, imresize, imwrite, IMWRITE_JPEG_QUALITY
+import cv2
 import os
 import sys
 
 def resize_im(input_dir, output_dir):
-    input_imgs = os.listdir(input_dir)
     
-    for imgs_name in os.listdir(input_dir):
-        C = imresize(imread(input_dir + '/' + imgs_name), (256, 256))
-        imwrite(output_dir + '/' + imgs_name, C, [IMWRITE_JPEG_QUALITY, 100])
+    for img_name in os.listdir(input_dir):
+        img = cv2.resize(cv2.imread(input_dir + '/' + img_name), (256, 256))
+        cv2.imwrite(output_dir + '/' + img_name, img, [cv2.IMWRITE_JPEG_QUALITY, 100])
 
