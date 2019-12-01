@@ -6,6 +6,8 @@ import datetime
 import os
 import sys
 
+from laplacian import laplacian
+from resize_im import resize_im
 
 print("Please wait ...")
 today=datetime.datetime.now().strftime('%d_%m_%Y_%T')
@@ -15,7 +17,7 @@ pathInput=sys.argv[1] + '/'
 pathOutput=sys.argv[2] + '/'
 modelfile=sys.argv[3]
 
-path_downscaled=pathOutput + "/temp"
+path_downscaled=pathOutput + "/temp/"
 
 if not os.path.exists(path_downscaled):
     os.mkdir(path_downscaled)
@@ -27,18 +29,18 @@ os.mkdir('logs')
 sys.stdout=open('logs/log_' + today + '.out')
 
 # Downscaling
-exec('resize_im.py', pathInput, path_downscaled)
+resize_im(pathInput, path_downscaled)
 
 # Dehazing
-# Dehaze all given images under a folder with given model
-# Example Usage: sh convertHazy2GT.sh folder_name model_name
-
 for img_name in os.listdir(path_downscaled):
-    inference(model=modelfile, input=img_name, output=img_name, image_size=256)
+    os.system('python inference.py --model {0} --input {1} --output {2} --image_size 256'.format(
+        modelfile, 
+        path_downscaled + '/' + img_name, 
+        pathOutput + img_name))
 
 # Upscaling
-exec('laplacian.py', pathInput, pathOutput)
+laplacian(path_downscaled, pathInput, pathOutput)
 
 
 if os.path.exists(path_downscaled):
-    exec('rm -rf ' + path_downscaled)
+    os.system('rm -rf ' + path_downscaled)
