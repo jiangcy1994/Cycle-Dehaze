@@ -1,28 +1,17 @@
-from cv2 import impyramid, imread, imresize, imwrite
+import cv2
+from itertools import accumulate
+import numpy as np
 import os
-import sys
+from skimage.transform import pyramid_gaussian
 
 def laplacian(input_dir, original_dir, out_dir):
 
     for img_name in os.listdir(input_dir):
-        A = double(imread(original_dir + '/' + img_name));
-        C = double(imread(input_dir + '/' + img_name));
-     
-        Ad1 = impyramid(A, 'reduce');
-        Ad2 = impyramid(Ad1, 'reduce');
-        Ad3 = impyramid(Ad2, 'reduce');
-        Ad4 = impyramid(Ad3, 'reduce');
+        A = cv2.imread(original_dir + '/' + img_name).astype(np.double);
+        C = cv2.imread(input_dir + '/' + img_name).astype(np.double);
 
-# TODO: check impyramid and imresize args
+        Ads = pyramid_gaussian(A, max_layer=4, multichannel=True)
+        Ls = [Ads[i] - cv2.resize(Ads[i + 1], Ads[i].shape[:2]) for i in range(4)]
+        Cus = accumulate([C] + Ls[::-1], lambda x, y: cv2.resize(x, y.shape[:2]) + y)
 
-        L1 = A - imresize(Ad1, [size(A,1), size(A,2)]);
-        L2 = Ad1 - imresize(Ad2, [size(Ad1,1), size(Ad1,2)]);
-        L3 = Ad2 - imresize(Ad3, [size(Ad2,1), size(Ad2,2)]);
-        L4 = Ad3 - imresize(Ad4, [size(Ad3,1), size(Ad3,2)]);
-
-        Cu1 = imresize(C, [size(Ad3,1), size(Ad3,2)]) + L4;
-        Cu2 = imresize(Cu1, [size(Ad2,1), size(Ad2,2)]) + L3;
-        Cu3 = imresize(Cu2, [size(Ad1,1), size(Ad1,2)]) + L2;
-        Cu4 = imresize(Cu3, [size(A,1), size(A,2)]) + L1;
-
-        imwrite(uint8(Cu4), out_dir + '/' + img_name, 'Mode', 'lossless')
+        cv2.imwrite(out_dir + '/' + img_name, Cus[-1].astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
