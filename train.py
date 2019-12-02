@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from model import CycleGAN
 from reader import Reader
 from datetime import datetime
